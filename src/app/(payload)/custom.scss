@@ -1,0 +1,841 @@
+@import '~@payloadcms/ui/scss';
+
+:root {
+  --sulux-ink: #0d0d0b;
+  --sulux-cream: #f8f7f4;
+  --sulux-stone: #6b6860;
+  --sulux-gold: #a07850;
+  --sulux-border: #e2ded8;
+  --sulux-muted: #c9c3b8;
+
+  --theme-bg: var(--sulux-cream);
+  --theme-text: var(--sulux-ink);
+  --theme-input-bg: #ffffff;
+  --theme-border-color: var(--sulux-border);
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #f8f7f4;
+  --theme-elevation-100: #f0ede8;
+  --theme-elevation-150: #e8e4dc;
+  --theme-elevation-200: #e2ded8;
+  --theme-elevation-250: #d9d5cf;
+  --theme-elevation-300: #cfc9c0;
+  --theme-elevation-350: #c4bdb2;
+  --theme-elevation-400: #b0a898;
+  --theme-elevation-450: #9a9288;
+  --theme-elevation-500: #8f8b81;
+  --theme-elevation-550: #7a756c;
+  --theme-elevation-600: #6b6860;
+  --theme-elevation-650: #5a5750;
+  --theme-elevation-700: #4a4742;
+  --theme-elevation-750: #3a3834;
+  --theme-elevation-800: #2a2926;
+  --theme-elevation-850: #1e1e1c;
+  --theme-elevation-900: #141413;
+  --theme-elevation-950: #0d0d0b;
+  --theme-elevation-1000: #050504;
+}
+
+html[data-theme='dark'] {
+  --theme-bg: #0d0d0b;
+  --theme-text: #e8e4dc;
+  --theme-input-bg: #1a1a18;
+  --theme-border-color: #2a2926;
+  --theme-elevation-0: #141413;
+  --theme-elevation-50: #1a1a18;
+  --theme-elevation-100: #1e1e1c;
+  --theme-elevation-150: #242422;
+  --theme-elevation-200: #2a2926;
+  --theme-elevation-250: #32312e;
+  --theme-elevation-300: #3a3834;
+  --theme-elevation-350: #44423d;
+  --theme-elevation-400: #4f4c47;
+  --theme-elevation-450: #5a5750;
+  --theme-elevation-500: #6b6860;
+  --theme-elevation-550: #7a756c;
+  --theme-elevation-600: #8f8b81;
+  --theme-elevation-650: #a39d92;
+  --theme-elevation-700: #b8b1a5;
+  --theme-elevation-750: #c9c3b8;
+  --theme-elevation-800: #d9d5cf;
+  --theme-elevation-850: #e8e4dc;
+  --theme-elevation-900: #f0ede8;
+  --theme-elevation-950: #f8f7f4;
+  --theme-elevation-1000: #ffffff;
+}
+
+.sulux-brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.sulux-brand__primary {
+  color: var(--theme-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.sulux-brand__secondary {
+  color: var(--theme-elevation-500);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+.sulux-brand__tagline {
+  color: var(--theme-elevation-500);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  margin-top: 0.85rem;
+  text-transform: uppercase;
+}
+
+.sulux-brand--compact .sulux-brand__primary {
+  font-size: 0.95rem;
+}
+
+.sulux-brand--compact .sulux-brand__secondary {
+  font-size: 0.42rem;
+  margin-top: 0.25rem;
+}
+
+.sulux-brand--icon {
+  align-items: center;
+  justify-content: center;
+}
+
+.sulux-brand__mark {
+  align-items: center;
+  background: linear-gradient(145deg, var(--sulux-gold), #7a5a38);
+  border-radius: 0.35rem;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 800;
+  height: 2rem;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 2rem;
+}
+
+.sulux-dashboard-hero {
+  background: linear-gradient(
+    135deg,
+    var(--theme-elevation-0) 0%,
+    var(--theme-elevation-50) 55%,
+    var(--theme-elevation-100) 100%
+  );
+  border: 1px solid var(--theme-border-color);
+  border-left: 3px solid var(--sulux-gold);
+  margin-bottom: calc(var(--base) * 1.5);
+  overflow: hidden;
+  position: relative;
+}
+
+.sulux-dashboard-hero__glow {
+  background: radial-gradient(
+    circle at 85% 15%,
+    color-mix(in srgb, var(--sulux-gold) 18%, transparent),
+    transparent 55%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.sulux-dashboard-hero__corner {
+  border-color: var(--sulux-gold);
+  border-style: solid;
+  height: 1.15rem;
+  opacity: 0.55;
+  pointer-events: none;
+  position: absolute;
+  width: 1.15rem;
+  z-index: 1;
+}
+
+.sulux-dashboard-hero__corner--tl {
+  border-width: 1px 0 0 1px;
+  left: 1rem;
+  top: 1rem;
+}
+
+.sulux-dashboard-hero__corner--br {
+  border-width: 0 1px 1px 0;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.sulux-dashboard-hero__texture {
+  background-image:
+    linear-gradient(var(--theme-elevation-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--theme-elevation-200) 1px, transparent 1px);
+  background-size: 42px 42px;
+  inset: 0;
+  opacity: 0.35;
+  pointer-events: none;
+  position: absolute;
+}
+
+.sulux-dashboard-hero__content {
+  display: grid;
+  gap: calc(var(--base) * 1.25);
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  padding: calc(var(--base) * 1.75);
+  position: relative;
+  z-index: 1;
+}
+
+.sulux-dashboard-hero__eyebrow {
+  align-items: center;
+  color: var(--theme-elevation-500);
+  display: flex;
+  font-size: 0.68rem;
+  font-weight: 600;
+  gap: 0.75rem;
+  letter-spacing: 0.28em;
+  margin: 0 0 0.85rem;
+  text-transform: uppercase;
+}
+
+.sulux-dashboard-hero__eyebrow-line {
+  background: var(--sulux-gold);
+  display: inline-block;
+  height: 1px;
+  width: 2rem;
+}
+
+.sulux-dashboard-hero__title {
+  color: var(--theme-text);
+  font-size: clamp(1.6rem, 2.4vw, 2.35rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 0.85rem;
+}
+
+.sulux-dashboard-hero__title span {
+  font-weight: 600;
+}
+
+.sulux-dashboard-hero__date {
+  color: var(--theme-elevation-500);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  margin: 0.85rem 0 0;
+}
+
+.sulux-dashboard-hero__description {
+  color: var(--theme-elevation-500);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 42rem;
+}
+
+.sulux-dashboard-hero__meta {
+  border-top: 1px solid var(--theme-border-color);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding: 1rem calc(var(--base) * 1.75) calc(var(--base) * 1.35);
+  position: relative;
+  z-index: 1;
+}
+
+.sulux-dashboard-hero__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 9rem;
+}
+
+.sulux-dashboard-hero__meta-label {
+  color: var(--theme-elevation-500);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.sulux-dashboard-hero__meta-value {
+  color: var(--theme-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.sulux-dashboard-hero__meta-divider {
+  align-self: stretch;
+  background: var(--theme-border-color);
+  display: none;
+  width: 1px;
+}
+
+.dashboard {
+  .card {
+    border: 1px solid var(--theme-border-color);
+    border-radius: 0;
+    box-shadow: none;
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
+  }
+
+  .card:hover {
+    border-color: color-mix(in srgb, var(--sulux-gold) 45%, var(--theme-border-color));
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--sulux-ink) 6%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes sulux-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sulux-dashboard-hero,
+  .sulux-dashboard-stats__header,
+  .sulux-stat-card,
+  .sulux-chart-card {
+    animation: sulux-fade-up 480ms ease both;
+  }
+
+  .sulux-dashboard-stats {
+    animation: sulux-fade-up 520ms ease both;
+  }
+}
+
+.nav {
+  border-right: 1px solid var(--theme-border-color);
+  --nav-link-font-size: 0.98rem;
+  --nav-group-font-size: 0.78rem;
+}
+
+.nav__wrap {
+  padding-top: 0.35rem;
+}
+
+.nav__link {
+  align-items: center;
+  display: flex;
+  font-size: var(--nav-link-font-size);
+  font-weight: 500;
+  gap: 0.7rem;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  min-height: 2.65rem;
+  padding: 0.7rem 0.95rem;
+  position: relative;
+}
+
+.nav__link:hover,
+.nav__link:focus-visible {
+  background: var(--theme-elevation-50);
+}
+
+.nav__link-icon {
+  align-items: center;
+  color: var(--theme-elevation-500);
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 1.15rem;
+}
+
+.nav__link:hover .nav__link-icon,
+.nav__link:focus-visible .nav__link-icon,
+.nav__link:has(.nav__link-indicator) .nav__link-icon {
+  color: var(--sulux-gold);
+}
+
+.nav__link-label {
+  font-size: var(--nav-link-font-size);
+}
+
+.nav__link-indicator {
+  background: var(--sulux-gold);
+  border-radius: 0;
+  width: 3px;
+}
+
+.nav-group {
+  margin-bottom: 0.65rem;
+}
+
+.nav-group__toggle {
+  color: var(--theme-elevation-500);
+  font-size: var(--nav-group-font-size);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.35rem;
+  padding: 0.35rem 0.95rem;
+  text-transform: uppercase;
+}
+
+.nav-group__toggle:hover,
+.nav-group__toggle:focus-visible {
+  color: var(--theme-text);
+}
+
+.nav__controls {
+  padding-inline: 0.65rem;
+}
+
+.sulux-nav-icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.sulux-nav-icon svg {
+  display: block;
+}
+
+.nav__header {
+  border-bottom: 1px solid var(--theme-border-color);
+  padding-block: calc(var(--base) * 0.75);
+}
+
+.template-default__wrap {
+  background: var(--theme-bg);
+}
+
+.sulux-dashboard-stats {
+  margin-bottom: calc(var(--base) * 1.75);
+}
+
+.sulux-dashboard-stats__header {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.75rem;
+  justify-content: space-between;
+  margin-bottom: calc(var(--base) * 1.25);
+}
+
+.sulux-dashboard-stats__intro {
+  max-width: 34rem;
+}
+
+.sulux-dashboard-stats__eyebrow {
+  align-items: center;
+  color: var(--theme-elevation-500);
+  display: flex;
+  font-size: 0.68rem;
+  font-weight: 600;
+  gap: 0.7rem;
+  letter-spacing: 0.28em;
+  margin: 0 0 0.45rem;
+  text-transform: uppercase;
+}
+
+.sulux-dashboard-stats__eyebrow-line {
+  background: var(--sulux-gold);
+  display: inline-block;
+  height: 1px;
+  width: 1.75rem;
+}
+
+.sulux-dashboard-stats__title {
+  color: var(--theme-text);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.4rem;
+}
+
+.sulux-dashboard-stats__subtitle {
+  color: var(--theme-elevation-500);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.sulux-dashboard-stats__highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.sulux-highlight-pill {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 9.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.sulux-highlight-pill__label {
+  color: var(--theme-elevation-500);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sulux-highlight-pill__value {
+  color: var(--theme-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sulux-dashboard-stats__grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-bottom: calc(var(--base) * 1.35);
+}
+
+.sulux-stat-card {
+  background: linear-gradient(
+    165deg,
+    var(--theme-elevation-0) 0%,
+    var(--theme-elevation-50) 100%
+  );
+  border: 1px solid var(--theme-border-color);
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 8.25rem;
+  overflow: hidden;
+  padding: 1.05rem 1.15rem 1.1rem;
+  position: relative;
+  text-decoration: none;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.sulux-stat-card__accent {
+  background: linear-gradient(90deg, var(--sulux-gold), transparent);
+  height: 2px;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: opacity 200ms ease;
+}
+
+.sulux-stat-card:hover {
+  border-color: color-mix(in srgb, var(--sulux-gold) 50%, var(--theme-border-color));
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--sulux-ink) 7%, transparent);
+  transform: translateY(-3px);
+}
+
+.sulux-stat-card:hover .sulux-stat-card__accent {
+  opacity: 1;
+}
+
+.sulux-stat-card__top {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.sulux-stat-card__icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--sulux-gold) 12%, var(--theme-elevation-0));
+  border: 1px solid color-mix(in srgb, var(--sulux-gold) 22%, var(--theme-border-color));
+  color: var(--sulux-gold);
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.sulux-stat-card__icon .sulux-nav-icon svg {
+  height: 16px;
+  width: 16px;
+}
+
+.sulux-stat-card__label {
+  color: var(--theme-elevation-500);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sulux-stat-card__value {
+  color: var(--theme-text);
+  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.sulux-stat-card__hint {
+  color: var(--theme-elevation-500);
+  font-size: 0.8rem;
+  margin-top: auto;
+  padding-top: 0.15rem;
+}
+
+.sulux-dashboard-charts {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sulux-chart-card {
+  padding: 1.35rem 1.45rem 1.5rem;
+}
+
+.sulux-chart-card__header {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.sulux-chart-card__title-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.85rem;
+}
+
+.sulux-chart-card__badge {
+  align-items: center;
+  background: color-mix(in srgb, var(--sulux-gold) 12%, var(--theme-elevation-0));
+  border: 1px solid color-mix(in srgb, var(--sulux-gold) 22%, var(--theme-border-color));
+  color: var(--sulux-gold);
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 2.35rem;
+  justify-content: center;
+  width: 2.35rem;
+}
+
+.sulux-chart-card__badge--sales {
+  background: color-mix(in srgb, var(--sulux-ink) 6%, var(--theme-elevation-0));
+  border-color: var(--theme-border-color);
+  color: var(--theme-text);
+}
+
+.sulux-chart-card__badge .sulux-stat-card__icon {
+  background: transparent;
+  border: 0;
+  height: auto;
+  width: auto;
+}
+
+.sulux-chart-card__title {
+  color: var(--theme-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+}
+
+.sulux-chart-card__description {
+  color: var(--theme-elevation-500);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.sulux-chart-card__metric {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-border-color);
+  color: var(--theme-elevation-600);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+}
+
+.sulux-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.sulux-bar-chart__row {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 7.75rem minmax(0, 1fr) 2.25rem;
+}
+
+.sulux-bar-chart__label {
+  color: var(--theme-elevation-600);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.sulux-bar-chart__track {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  height: 0.65rem;
+  overflow: hidden;
+}
+
+.sulux-bar-chart__fill {
+  height: 100%;
+  min-width: 0;
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sulux-bar-chart__fill--pending_payment,
+.sulux-bar-chart__fill--cod_pending {
+  background: linear-gradient(90deg, #c9a227, #9a7b1c);
+}
+
+.sulux-bar-chart__fill--paid {
+  background: linear-gradient(90deg, #3d7a52, #2f5f40);
+}
+
+.sulux-bar-chart__fill--fulfilled {
+  background: linear-gradient(90deg, var(--sulux-gold), #7a5a38);
+}
+
+.sulux-bar-chart__fill--cancelled {
+  background: linear-gradient(90deg, #8f8b81, #6b6860);
+}
+
+.sulux-bar-chart__value {
+  color: var(--theme-text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.sulux-column-chart {
+  align-items: end;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  min-height: 15rem;
+  position: relative;
+}
+
+.sulux-column-chart__grid {
+  display: flex;
+  flex-direction: column;
+  inset: 0 0 3.5rem;
+  justify-content: space-between;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.sulux-column-chart__grid span {
+  border-top: 1px dashed var(--theme-elevation-200);
+  display: block;
+  width: 100%;
+}
+
+.sulux-column-chart__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  height: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.sulux-column-chart__item--peak .sulux-column-chart__bar {
+  background: linear-gradient(180deg, #c9a86a, var(--sulux-gold) 45%, #7a5a38);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sulux-gold) 35%, transparent);
+}
+
+.sulux-column-chart__item--peak .sulux-column-chart__label,
+.sulux-column-chart__item--peak .sulux-column-chart__value {
+  color: var(--sulux-gold);
+  font-weight: 700;
+}
+
+.sulux-column-chart__bar-wrap {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  min-height: 9rem;
+}
+
+.sulux-column-chart__bar {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sulux-gold) 80%, white), #7a5a38);
+  min-height: 0;
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 72%;
+}
+
+.sulux-column-chart__label {
+  color: var(--theme-elevation-500);
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.sulux-column-chart__value {
+  color: var(--theme-text);
+  font-size: 0.64rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+}
+
+
+@media (max-width: 1200px) {
+  .sulux-dashboard-stats__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .sulux-dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .sulux-bar-chart__row {
+    grid-template-columns: 6.5rem minmax(0, 1fr) 2rem;
+  }
+
+  .sulux-dashboard-stats__highlights {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .sulux-dashboard-stats__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sulux-column-chart__value {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .sulux-dashboard-hero__meta-divider {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .sulux-dashboard-hero__content {
+    grid-template-columns: 1fr;
+  }
+}
