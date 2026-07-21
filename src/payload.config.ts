@@ -28,7 +28,11 @@ const storefrontURL = getStorefrontURL()
 const allowedOrigins = [
   ...new Set([serverURL, storefrontURL, ...parseAllowedOrigins(process.env.CORS_ORIGIN)]),
 ]
-
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://sulux-hour-client.vercel.app',
+]
 const seoExtraFields: Field[] = [
   {
     name: 'keywords',
