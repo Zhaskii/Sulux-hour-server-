@@ -2,8 +2,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import {
-  resolveStorefrontProductImageSync,
-  resolveStorefrontProductImageUrl,
+  resolveStorefrontProductImageForListing,
+  resolveStorefrontProductImageUrlForListing,
 } from '@/utilities/resolve-storefront-product-image'
 
 const DEFAULT_LIMIT = 8
@@ -51,7 +51,7 @@ async function enrichProductWithImage(
   payload: Awaited<ReturnType<typeof getPayload>>,
   product: Record<string, unknown> & { name: string; slug: string },
 ) {
-  const displayImageUrl = await resolveStorefrontProductImageUrl(payload, product)
+  const displayImageUrl = await resolveStorefrontProductImageUrlForListing(payload, product)
   return { ...product, displayImageUrl }
 }
 
@@ -80,7 +80,7 @@ async function searchBrandProductsWithImages(
     totalDocs = batch.totalDocs
 
     for (const product of batch.docs) {
-      const displayImageUrl = resolveStorefrontProductImageSync(product)
+      const displayImageUrl = resolveStorefrontProductImageForListing(product)
       if (!displayImageUrl) continue
 
       matched.push({ ...product, displayImageUrl })

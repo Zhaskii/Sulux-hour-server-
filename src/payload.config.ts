@@ -28,11 +28,7 @@ const storefrontURL = getStorefrontURL()
 const allowedOrigins = [
   ...new Set([serverURL, storefrontURL, ...parseAllowedOrigins(process.env.CORS_ORIGIN)]),
 ]
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://sulux-hour-client.vercel.app',
-]
+
 const seoExtraFields: Field[] = [
   {
     name: 'keywords',
@@ -168,6 +164,8 @@ export default buildConfig({
   email: nodemailerAdapter({
     defaultFromAddress: 'contact@arkshfood.com',
     defaultFromName: 'SULUX CENTRE',
+    // Avoid opening SMTP connections while Payload loads config (including during builds).
+    skipVerify: true,
     transportOptions: {
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),

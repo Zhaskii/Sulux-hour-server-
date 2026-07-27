@@ -138,7 +138,10 @@ export const Orders: CollectionConfig = {
           name: 'product',
           type: 'relationship',
           relationTo: 'products',
-          required: true,
+          admin: {
+            description:
+              'May be empty on historical orders after the referenced product is deleted.',
+          },
         },
         {
           name: 'productName',

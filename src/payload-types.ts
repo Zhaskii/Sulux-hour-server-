@@ -160,7 +160,10 @@ export interface Order {
    */
   orderNotes?: string | null;
   lineItems: {
-    product: number | Product;
+    /**
+     * May be empty on historical orders after the referenced product is deleted.
+     */
+    product?: (number | null) | Product;
     productName: string;
     productSku: string;
     unitPrice: number;

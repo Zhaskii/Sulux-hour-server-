@@ -12,6 +12,8 @@ import * as migration_20260701_120000_posts_view_count from './20260701_120000_p
 import * as migration_20260702_120000_newsletter from './20260702_120000_newsletter';
 import * as migration_20260703_120000_orders_payment_pickup from './20260703_120000_orders_payment_pickup';
 import * as migration_20260708_105643 from './20260708_105643';
+import * as migration_20260727_104500_products_compare_at_price from './20260727_104500_products_compare_at_price';
+import * as migration_20260727_105000_orders_product_nullable from './20260727_105000_orders_product_nullable';
 
 export const migrations = [
   {
@@ -83,5 +85,15 @@ export const migrations = [
     up: migration_20260708_105643.up,
     down: migration_20260708_105643.down,
     name: '20260708_105643',
+  },
+  {
+    up: migration_20260727_104500_products_compare_at_price.up,
+    down: migration_20260727_104500_products_compare_at_price.down,
+    name: '20260727_104500_products_compare_at_price',
+  },
+  {
+    up: migration_20260727_105000_orders_product_nullable.up,
+    down: migration_20260727_105000_orders_product_nullable.down,
+    name: '20260727_105000_orders_product_nullable',
   },
 ];
