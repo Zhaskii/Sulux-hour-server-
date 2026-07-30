@@ -3,7 +3,7 @@ import type { Product } from '../payload-types'
 import { computeProductPriceFromDiscount } from './compute-product-price'
 
 type PricingDoc = Partial<
-  Pick<Product, 'originalPrice' | 'discountPercentage' | 'price' | 'compareAtPrice'>
+  Pick<Product, 'originalPrice' | 'discountPercentage' | 'price'>
 >
 
 function readPositiveNumber(value: unknown): number | null {
@@ -41,6 +41,5 @@ export function applyProductPricing<T extends PricingDoc>(
     originalPrice: original,
     discountPercentage: discount,
     price: computed.price,
-    compareAtPrice: computed.compareAtPrice,
   }
 }

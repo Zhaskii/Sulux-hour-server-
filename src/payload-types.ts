@@ -154,16 +154,13 @@ export interface Order {
    */
   shippingCountry: string;
   shippingPostalCode?: string | null;
-  paymentMethod: 'cod' | 'pickup' | 'online';
+  paymentMethod: 'cod' | 'pickup' | 'online' | 'qr';
   /**
    * Delivery instructions from the customer.
    */
   orderNotes?: string | null;
   lineItems: {
-    /**
-     * May be empty on historical orders after the referenced product is deleted.
-     */
-    product?: (number | null) | Product;
+    product: number | Product;
     productName: string;
     productSku: string;
     unitPrice: number;
@@ -180,6 +177,22 @@ export interface Order {
    * Optional — linked when the customer is signed in.
    */
   user?: (number | null) | User;
+  /**
+   * Verification details from the payment gateway.
+   */
+  paymentDetails?: {
+    gateway?: string | null;
+    status?: string | null;
+    transactionId?: string | null;
+    tokenId?: string | null;
+    amount?: number | null;
+    bankRemarks?: string | null;
+    verifiedAt?: string | null;
+    /**
+     * Screenshot of the payment proof for QR payments.
+     */
+    qrImage?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -196,25 +209,22 @@ export interface Product {
   slug: string;
   status: 'draft' | 'active' | 'archived';
   brand: number | Brand;
-  categories: (number | Category)[];
+  categories?: (number | Category)[] | null;
   shortDescription: string;
   /**
    * Original MRP (list price before discount).
    */
   originalPrice?: number | null;
   /**
-   * Discount off original price. e.g. 10 = 10% off.
+   * Discount off original price. e.g. 10 = 10% off. (Managed via Brand Discount settings)
    */
   discountPercentage?: number | null;
   /**
    * Selling price (auto-calculated from original price minus discount).
    */
   price: number;
-  /**
-   * Auto-set to original price when a discount is applied (shown as strikethrough on storefront).
-   */
   compareAtPrice?: number | null;
-  sku: string;
+  sku?: string | null;
   stockQuantity: number;
   isFeatured?: boolean | null;
   /**
@@ -235,6 +245,10 @@ export interface Product {
   showcaseOrder?: number | null;
   featuredImage: number | Media;
   gallery?: (number | Media)[] | null;
+  /**
+   * Optional URL for a YouTube, TikTok, or Instagram video.
+   */
+  videoUrl?: string | null;
   gender?: ('men' | 'women' | 'unisex') | null;
   movement?: ('automatic' | 'quartz' | 'mechanical' | 'smart') | null;
   caseMaterial?: string | null;
@@ -289,6 +303,10 @@ export interface Brand {
    */
   heroMedia?: (number | null) | Media;
   isActive?: boolean | null;
+  /**
+   * Default discount percentage for all products of this brand.
+   */
+  discountPercentage?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -672,6 +690,18 @@ export interface OrdersSelect<T extends boolean = true> {
   total?: T;
   couponCode?: T;
   user?: T;
+  paymentDetails?:
+    | T
+    | {
+        gateway?: T;
+        status?: T;
+        transactionId?: T;
+        tokenId?: T;
+        amount?: T;
+        bankRemarks?: T;
+        verifiedAt?: T;
+        qrImage?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -699,6 +729,7 @@ export interface ProductsSelect<T extends boolean = true> {
   showcaseOrder?: T;
   featuredImage?: T;
   gallery?: T;
+  videoUrl?: T;
   gender?: T;
   movement?: T;
   caseMaterial?: T;
@@ -739,6 +770,7 @@ export interface BrandsSelect<T extends boolean = true> {
   description?: T;
   heroMedia?: T;
   isActive?: T;
+  discountPercentage?: T;
   meta?:
     | T
     | {

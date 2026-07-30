@@ -4,6 +4,7 @@ import {
   canAccessAdmin,
   canCreateUser,
   canDeleteContent,
+  canManageUsers,
   canReadUser,
   canUpdateUser,
   type UserRole,

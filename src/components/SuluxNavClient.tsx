@@ -102,12 +102,30 @@ const SuluxNavClient = ({ groups, navPreferences }: SuluxNavClientProps) => {
         <BrowseByFolderButton active={viewingRootFolderView} />
       ) : null}
 
-      {groups.map((group, groupIndex) => (
-        <NavGroup
-          isOpen={navPreferences?.groups?.[group.label]?.open}
-          key={group.label ?? groupIndex}
-          label={group.label}
-        >
+      {groups.map((group, groupIndex) => {
+        const isAnyEntityActive = group.entities.some((entity) => {
+          const { slug, type } = entity
+          let href = ''
+          if (type === EntityType.collection) {
+            href = formatAdminURL({
+              adminRoute,
+              path: `/collections/${slug}`,
+            })
+          } else if (type === EntityType.global) {
+            href = formatAdminURL({
+              adminRoute,
+              path: `/globals/${slug}`,
+            })
+          }
+          return pathname.startsWith(href) && ['/', undefined].includes(pathname[href.length])
+        })
+
+        return (
+          <NavGroup
+            isOpen={isAnyEntityActive || navPreferences?.groups?.[group.label]?.open}
+            key={group.label ?? groupIndex}
+            label={group.label}
+          >
           {group.entities.map((entity, entityIndex) => {
             const { slug, type, label } = entity
 
@@ -166,7 +184,8 @@ const SuluxNavClient = ({ groups, navPreferences }: SuluxNavClientProps) => {
             )
           })}
         </NavGroup>
-      ))}
+        )
+      })}
     </Fragment>
   )
 }

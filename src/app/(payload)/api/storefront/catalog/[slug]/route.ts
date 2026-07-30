@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { resolveProductPricingForStorefront } from '@/utilities/resolve-storefront-product-pricing'
+import { resolveStorefrontProductImageForListing } from '@/utilities/resolve-storefront-product-image'
 
 /** Must cover largest brand catalog (e.g. Rado ~196 in import sheet). */
 const PRODUCTS_LIMIT = 250
@@ -45,7 +46,9 @@ const productSelect = {
   categories: true,
   shortDescription: true,
   price: true,
-  compareAtPrice: true,
+  originalPrice: true,
+  discountPercentage: true,
+  sku: true,
   stockQuantity: true,
   featuredImage: true,
   movement: true,
@@ -95,18 +98,27 @@ export async function GET(
         select: productSelect,
       })
 
+      const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop'
+
+      const productsWithImages = products.docs.map((product) => {
+        const displayImageUrl =
+          resolveStorefrontProductImageForListing(product) || FALLBACK_IMAGE_URL
+        return {
+          ...resolveProductPricingForStorefront(product, { brandSlug: brand.slug }),
+          displayImageUrl,
+        }
+      })
+
       return Response.json(
         {
           type: 'brand' as const,
           catalog: brand,
-          products: products.docs.map((product) =>
-            resolveProductPricingForStorefront(product, { brandSlug: brand.slug }),
-          ),
-          totalProducts: products.totalDocs,
+          products: productsWithImages,
+          totalProducts: productsWithImages.length,
         },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
           },
         },
       )
@@ -139,18 +151,27 @@ export async function GET(
         select: productSelect,
       })
 
+      const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop'
+
+      const productsWithImages = products.docs.map((product) => {
+        const displayImageUrl =
+          resolveStorefrontProductImageForListing(product) || FALLBACK_IMAGE_URL
+        return {
+          ...resolveProductPricingForStorefront(product),
+          displayImageUrl,
+        }
+      })
+
       return Response.json(
         {
           type: 'category' as const,
           catalog: category,
-          products: products.docs.map((product) =>
-            resolveProductPricingForStorefront(product),
-          ),
-          totalProducts: products.totalDocs,
+          products: productsWithImages,
+          totalProducts: productsWithImages.length,
         },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
           },
         },
       )

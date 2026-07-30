@@ -66,20 +66,73 @@ export const Brands: CollectionConfig = {
       type: 'checkbox',
       defaultValue: true,
     },
-  ],
-   hooks: {
-      beforeValidate: [
-        ({ data }) => {
-          if (!data?.name) {
-            return data
-          }
-  
-          return {
-            ...data,
-            slug: formatSlug(data.slug || data.name),
-          }
-        },
-      ],
+    {
+      name: 'discountPercentage',
+      type: 'number',
+      min: 0,
+      max: 100,
+      defaultValue: 0,
+      admin: {
+        description: 'Default discount percentage for all products of this brand.',
+      },
     },
- 
+  ],
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (!data?.name) {
+          return data
+        }
+
+        return {
+          ...data,
+          slug: formatSlug(data.slug || data.name),
+        }
+      },
+    ],
+    afterChange: [
+      async ({ doc, req }) => {
+        const brandId = doc.id
+        const brandDiscount = doc.discountPercentage ?? 0
+
+        // Set flag in transaction request context to bypass categories validation on sync updates
+        req.context.skipProductCategoriesValidation = true
+
+        // Find all products of this brand (using a large limit to avoid default pagination capping)
+        const products = await req.payload.find({
+          collection: 'products',
+          where: {
+            brand: { equals: brandId },
+          },
+          limit: 1000,
+          depth: 0,
+          req,
+          overrideAccess: true,
+        })
+
+        console.log(`[brand-afterChange] Found ${products.docs.length} products for brand ${doc.name} (ID: ${brandId})`)
+
+        for (const product of products.docs) {
+          console.log(`[brand-afterChange] Product: ${product.slug}, Current discountPercentage: ${product.discountPercentage}, Brand discount: ${brandDiscount}`)
+          if (product.discountPercentage !== brandDiscount) {
+            console.log(`[brand-afterChange] Updating product ${product.slug} to discount ${brandDiscount}`)
+            try {
+              const updatedProduct = await req.payload.update({
+                collection: 'products',
+                id: product.id,
+                data: {
+                  discountPercentage: brandDiscount,
+                },
+                req,
+                overrideAccess: true,
+              })
+              console.log(`[brand-afterChange] Update success for ${product.slug}. New price: ${updatedProduct.price}, discount: ${updatedProduct.discountPercentage}`)
+            } catch (err: any) {
+              console.error(`[brand-afterChange] Update failed for ${product.slug}:`, err.message || err)
+            }
+          }
+        }
+      },
+    ],
+  },
 }

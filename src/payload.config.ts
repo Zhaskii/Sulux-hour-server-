@@ -164,8 +164,6 @@ export default buildConfig({
   email: nodemailerAdapter({
     defaultFromAddress: 'contact@arkshfood.com',
     defaultFromName: 'SULUX CENTRE',
-    // Avoid opening SMTP connections while Payload loads config (including during builds).
-    skipVerify: true,
     transportOptions: {
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
@@ -209,7 +207,7 @@ export default buildConfig({
           return `${storefrontURL}/blog/${doc?.slug}`
         }
 
-        return `${storefrontURL}/product-detail/${doc?.slug}`
+        return `${storefrontURL}/products/${doc?.slug}`
       },
 
       generateImage: ({ doc, collectionSlug }) => {

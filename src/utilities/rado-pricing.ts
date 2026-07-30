@@ -1,1 +1,0 @@
-export { STANDARD_BRAND_DISCOUNT_PERCENTAGE as RADO_DISCOUNT_PERCENTAGE } from './brand-pricing'

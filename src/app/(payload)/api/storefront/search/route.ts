@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 
 import {
   resolveStorefrontProductImageForListing,
-  resolveStorefrontProductImageUrlForListing,
+  resolveStorefrontProductImageUrl,
 } from '@/utilities/resolve-storefront-product-image'
 
 const DEFAULT_LIMIT = 8
@@ -21,7 +21,8 @@ const productSelect = {
   categories: true,
   shortDescription: true,
   price: true,
-  compareAtPrice: true,
+  originalPrice: true,
+  discountPercentage: true,
   stockQuantity: true,
   featuredImage: true,
   gallery: true,
@@ -31,6 +32,28 @@ const productSelect = {
   caseSizeMm: true,
   createdAt: true,
 } as const
+
+type StorefrontProductDoc = {
+  id: number
+  name: string
+  slug: string
+  status: 'draft' | 'active' | 'archived'
+  brand: unknown
+  categories?: unknown
+  shortDescription: string
+  price: number
+  originalPrice?: number | null
+  discountPercentage?: number | null
+  compareAtPrice?: number | null
+  stockQuantity: number
+  featuredImage?: unknown
+  gallery?: unknown
+  movement?: string | null
+  dialColor?: string | null
+  strapMaterial?: string | null
+  caseSizeMm?: number | null
+  createdAt: string
+}
 
 function emptyList(limit: number) {
   return {
@@ -48,19 +71,19 @@ function emptyList(limit: number) {
 }
 
 async function enrichProductWithImage(
-  payload: Awaited<ReturnType<typeof getPayload>>,
-  product: Record<string, unknown> & { name: string; slug: string },
+  payload: any,
+  product: any,
 ) {
-  const displayImageUrl = await resolveStorefrontProductImageUrlForListing(payload, product)
+  const displayImageUrl = await resolveStorefrontProductImageUrl(payload, product)
   return { ...product, displayImageUrl }
 }
 
 async function searchBrandProductsWithImages(
-  payload: Awaited<ReturnType<typeof getPayload>>,
+  payload: any,
   brandIds: number[],
   limit: number,
 ) {
-  const matched: Array<Record<string, unknown> & { displayImageUrl: string }> = []
+  const matched: any[] = []
   let totalDocs = 0
   let page = 1
 
@@ -148,7 +171,7 @@ export async function GET(request: Request) {
         },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+            'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=45',
           },
         },
       )
@@ -166,6 +189,7 @@ export async function GET(request: Request) {
             or: [
               { name: { like: query } },
               { slug: { like: query } },
+              { sku: { like: query } },
               { shortDescription: { like: query } },
             ],
           },
@@ -175,7 +199,13 @@ export async function GET(request: Request) {
     })
 
     const docs = await Promise.all(
-      products.docs.map((product) => enrichProductWithImage(payload, product)),
+      products.docs.map(async (product) => {
+        let displayImageUrl = resolveStorefrontProductImageForListing(product)
+        if (!displayImageUrl) {
+          displayImageUrl = await resolveStorefrontProductImageUrl(payload, product)
+        }
+        return { ...product, displayImageUrl }
+      }),
     )
 
     return Response.json(
@@ -193,7 +223,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+          'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=45',
         },
       },
     )

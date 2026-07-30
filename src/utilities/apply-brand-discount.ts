@@ -1,20 +1,14 @@
 import type { PayloadRequest } from 'payload'
 
-import { getBrandDiscountBySlug } from './brand-pricing'
+type BrandRef = number | string | { id?: number | string; slug?: string | null } | null | undefined
 
-type BrandRef = number | { id?: number; slug?: string | null } | null | undefined
-
-async function resolveBrandSlug(
+async function resolveBrandDiscount(
   brandRef: BrandRef,
   req?: PayloadRequest,
-): Promise<string | null> {
+): Promise<number | null> {
   if (!brandRef) return null
 
-  if (typeof brandRef === 'object' && brandRef.slug) {
-    return brandRef.slug
-  }
-
-  const brandId = typeof brandRef === 'number' ? brandRef : brandRef.id
+  const brandId = typeof brandRef === 'object' ? brandRef.id : brandRef
   if (!brandId || !req?.payload) return null
 
   try {
@@ -22,15 +16,15 @@ async function resolveBrandSlug(
       collection: 'brands',
       id: brandId,
       depth: 0,
-      select: { slug: true },
+      select: { discountPercentage: true },
     })
-    return brand?.slug ?? null
+    return brand?.discountPercentage ?? null
   } catch {
     return null
   }
 }
 
-export async function applyBrandDiscountIfConfigured<T extends Record<string, unknown>>(
+export async function applyBrandDiscountIfConfigured<T extends Record<string, any>>(
   data: T | undefined,
   originalDoc: { brand?: BrandRef } | null | undefined,
   req?: PayloadRequest,
@@ -38,8 +32,7 @@ export async function applyBrandDiscountIfConfigured<T extends Record<string, un
   if (!data) return data
 
   const brandRef = (data.brand as BrandRef | undefined) ?? originalDoc?.brand
-  const brandSlug = await resolveBrandSlug(brandRef, req)
-  const discount = getBrandDiscountBySlug(brandSlug)
+  const discount = await resolveBrandDiscount(brandRef, req)
 
   if (discount == null) return data
 

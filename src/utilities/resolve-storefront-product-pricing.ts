@@ -1,9 +1,7 @@
 import type { PayloadRequest } from 'payload'
-
-import { getBrandDiscountBySlug } from './brand-pricing'
 import { applyProductPricing } from './apply-product-pricing'
 
-type BrandRef = number | { id?: number; slug?: string | null } | null | undefined
+type BrandRef = number | string | { id?: number | string; slug?: string | null; discountPercentage?: number | null } | null | undefined
 
 export type ProductPricingFields = {
   price: number
@@ -17,19 +15,24 @@ type ResolveProductPricingOptions = {
   brandSlug?: string | null
 }
 
-function getBrandSlug(brand: BrandRef): string | null {
+function getBrandDiscountSync(brand: BrandRef): number | null {
   if (!brand || typeof brand !== 'object') return null
-  return brand.slug ?? null
+  return 'discountPercentage' in brand && typeof brand.discountPercentage === 'number'
+    ? brand.discountPercentage
+    : null
 }
 
-async function resolveBrandSlug(
+async function resolveBrandDiscountAsync(
   brandRef: BrandRef,
   req?: PayloadRequest,
-): Promise<string | null> {
-  const populatedSlug = getBrandSlug(brandRef)
-  if (populatedSlug) return populatedSlug
+): Promise<number | null> {
+  if (!brandRef) return null
 
-  const brandId = typeof brandRef === 'number' ? brandRef : brandRef?.id
+  if (typeof brandRef === 'object' && 'discountPercentage' in brandRef && typeof brandRef.discountPercentage === 'number') {
+    return brandRef.discountPercentage
+  }
+
+  const brandId = typeof brandRef === 'object' ? brandRef.id : brandRef
   if (!brandId || !req?.payload) return null
 
   try {
@@ -37,28 +40,23 @@ async function resolveBrandSlug(
       collection: 'brands',
       id: brandId,
       depth: 0,
-      select: { slug: true },
+      select: { discountPercentage: true },
     })
-    return brand?.slug ?? null
+    return brand?.discountPercentage ?? null
   } catch {
     return null
   }
 }
 
-function hasStoredSalePricing(
-  doc: ProductPricingFields,
-  expectedDiscount: number,
-): boolean {
+function hasStoredSalePricing(doc: ProductPricingFields): boolean {
   const price = Number(doc.price)
-  const compareAt = doc.compareAtPrice != null ? Number(doc.compareAtPrice) : null
-  const discount = Number(doc.discountPercentage ?? 0)
+  const original = doc.originalPrice != null ? Number(doc.originalPrice) : null
   return (
     Number.isFinite(price) &&
     price > 0 &&
-    compareAt != null &&
-    Number.isFinite(compareAt) &&
-    compareAt > price &&
-    discount === expectedDiscount
+    original != null &&
+    Number.isFinite(original) &&
+    original > price
   )
 }
 
@@ -66,16 +64,13 @@ function hasActiveDiscountDisplay(
   doc: ProductPricingFields,
   expectedDiscount: number,
 ): boolean {
-  if (hasStoredSalePricing(doc, expectedDiscount)) return true
+  if (hasStoredSalePricing(doc)) return true
 
   const discount = Number(doc.discountPercentage ?? 0)
-  const compareAt = doc.compareAtPrice != null ? Number(doc.compareAtPrice) : null
   const price = Number(doc.price)
 
   return (
-    discount === expectedDiscount &&
-    compareAt != null &&
-    compareAt > price &&
+    discount >= expectedDiscount &&
     price > 0
   )
 }
@@ -90,11 +85,7 @@ function resolveOriginalForBrandPricing(doc: ProductPricingFields): number | nul
   const original = readPositive(doc.originalPrice)
   if (original != null) return original
 
-  const compareAt = readPositive(doc.compareAtPrice)
-  const price = readPositive(doc.price)
-  if (compareAt != null && price != null && compareAt > price) return compareAt
-
-  return price
+  return readPositive(doc.price)
 }
 
 function applyBrandPricing<T extends ProductPricingFields>(
@@ -109,7 +100,6 @@ function applyBrandPricing<T extends ProductPricingFields>(
       originalPrice: original,
       discountPercentage: brandDiscount,
       price: doc.price,
-      compareAtPrice: doc.compareAtPrice,
     },
     doc,
   )
@@ -121,8 +111,18 @@ function applyBrandPricing<T extends ProductPricingFields>(
     originalPrice: priced.originalPrice ?? doc.originalPrice,
     discountPercentage: priced.discountPercentage,
     price: priced.price,
-    compareAtPrice: priced.compareAtPrice,
   }
+}
+
+function computeVirtualCompareAtPrice(priced: ProductPricingFields): number | null {
+  const discount = Number(priced.discountPercentage ?? 0)
+  const original = readPositive(priced.originalPrice)
+  const price = readPositive(priced.price)
+
+  if (discount > 0 && original != null && price != null && original > price) {
+    return original
+  }
+  return null
 }
 
 /** Ensure configured brand discounts are reflected in storefront pricing. */
@@ -130,23 +130,31 @@ export function resolveProductPricingForStorefront<T extends ProductPricingField
   doc: T,
   options?: ResolveProductPricingOptions,
 ): T {
-  const brandDiscount = getBrandDiscountBySlug(
-    options?.brandSlug ?? getBrandSlug(doc.brand),
-  )
-  if (brandDiscount == null) return doc
-  if (hasActiveDiscountDisplay(doc, brandDiscount)) return doc
+  let priced = doc
 
-  return applyBrandPricing(doc, brandDiscount)
+  const brandDiscount = getBrandDiscountSync(doc.brand)
+  if (brandDiscount != null && !hasActiveDiscountDisplay(doc, brandDiscount)) {
+    priced = applyBrandPricing(doc, brandDiscount)
+  }
+
+  return {
+    ...priced,
+    compareAtPrice: computeVirtualCompareAtPrice(priced),
+  }
 }
 
 export async function resolveProductPricingForStorefrontAsync<
   T extends ProductPricingFields,
 >(doc: T, req?: PayloadRequest, options?: ResolveProductPricingOptions): Promise<T> {
-  const brandDiscount = getBrandDiscountBySlug(
-    options?.brandSlug ?? (await resolveBrandSlug(doc.brand, req)),
-  )
-  if (brandDiscount == null) return doc
-  if (hasActiveDiscountDisplay(doc, brandDiscount)) return doc
+  let priced = doc
 
-  return applyBrandPricing(doc, brandDiscount)
+  const brandDiscount = await resolveBrandDiscountAsync(doc.brand, req)
+  if (brandDiscount != null && !hasActiveDiscountDisplay(doc, brandDiscount)) {
+    priced = applyBrandPricing(doc, brandDiscount)
+  }
+
+  return {
+    ...priced,
+    compareAtPrice: computeVirtualCompareAtPrice(priced),
+  }
 }

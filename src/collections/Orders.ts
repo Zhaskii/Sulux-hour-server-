@@ -20,6 +20,7 @@ const paymentMethods = [
   { label: 'Cash on Delivery', value: 'cod' },
   { label: 'Pick from Store', value: 'pickup' },
   { label: 'Online Payment', value: 'online' },
+  { label: 'QR Scan Payment', value: 'qr' },
 ]
 
 export const Orders: CollectionConfig = {
@@ -138,10 +139,7 @@ export const Orders: CollectionConfig = {
           name: 'product',
           type: 'relationship',
           relationTo: 'products',
-          admin: {
-            description:
-              'May be empty on historical orders after the referenced product is deleted.',
-          },
+          required: true,
         },
         {
           name: 'productName',
@@ -209,19 +207,95 @@ export const Orders: CollectionConfig = {
         description: 'Optional — linked when the customer is signed in.',
       },
     },
+    {
+      name: 'paymentDetails',
+      type: 'group',
+      admin: {
+        description: 'Verification details from the payment gateway.',
+      },
+      fields: [
+        {
+          name: 'gateway',
+          type: 'text',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'status',
+          type: 'text',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'transactionId',
+          type: 'text',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'tokenId',
+          type: 'text',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'amount',
+          type: 'number',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'bankRemarks',
+          type: 'text',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'verifiedAt',
+          type: 'date',
+          admin: { readOnly: true },
+        },
+        {
+          name: 'qrImage',
+          type: 'relationship',
+          relationTo: 'media',
+          required: false,
+          admin: {
+            description: 'Screenshot of the payment proof for QR payments.',
+          },
+        },
+        {
+          name: 'qrImagePreview',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '/components/QRImagePreview',
+            },
+          },
+        },
+      ],
+    },
   ],
 
   hooks: {
     afterChange: [
-      async ({ doc, operation, req }) => {
-        if (operation !== 'create') return doc
+      async ({ doc, previousDoc, operation, req }) => {
+        const order = doc as Order
 
-        void sendOrderConfirmationEmails(req.payload, doc as Order).catch((error) => {
-          req.payload.logger.error({
-            err: error,
-            msg: `Failed to send order emails for ${(doc as Order).orderNumber}`,
-          })
-        })
+        if (operation === 'create') {
+          if (order.paymentMethod === 'cod' || order.paymentMethod === 'pickup' || order.paymentMethod === 'qr') {
+            void sendOrderConfirmationEmails(req.payload, order).catch((error) => {
+              req.payload.logger.error({
+                err: error,
+                msg: `Failed to send order creation emails for ${order.orderNumber}`,
+              })
+            })
+          }
+        } else if (operation === 'update' && previousDoc) {
+          const prevOrder = previousDoc as Order
+          if (prevOrder.status === 'pending_payment' && order.status === 'paid') {
+            void sendOrderConfirmationEmails(req.payload, order).catch((error) => {
+              req.payload.logger.error({
+                err: error,
+                msg: `Failed to send order paid confirmation emails for ${order.orderNumber}`,
+              })
+            })
+          }
+        }
 
         return doc
       },

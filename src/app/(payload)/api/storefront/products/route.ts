@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 import type { Media } from '@/payload-types'
 
 import {
-  resolveStorefrontProductImageSync,
+  resolveStorefrontProductImageForListing,
   resolveStorefrontProductImageUrl,
 } from '@/utilities/resolve-storefront-product-image'
 import { resolveProductPricingForStorefront } from '@/utilities/resolve-storefront-product-pricing'
@@ -21,7 +21,9 @@ const productSelect = {
   categories: true,
   shortDescription: true,
   price: true,
-  compareAtPrice: true,
+  originalPrice: true,
+  discountPercentage: true,
+  sku: true,
   stockQuantity: true,
   featuredImage: true,
   gallery: true,
@@ -38,10 +40,13 @@ type StorefrontProductDoc = {
   slug: string
   status: 'draft' | 'active' | 'archived'
   brand: unknown
-  categories: unknown
+  categories?: unknown
   shortDescription: string
   price: number
+  originalPrice?: number | null
+  discountPercentage?: number | null
   compareAtPrice?: number | null
+  sku?: string | null
   stockQuantity: number
   featuredImage?: number | Media | null
   gallery?: (number | Media)[] | null
@@ -66,7 +71,7 @@ export async function GET() {
         collection: 'products',
         limit: PAGE_SIZE,
         page,
-        depth: 2,
+        depth: 1,
         sort: '-createdAt',
         where: {
           status: { equals: 'active' },
@@ -79,24 +84,18 @@ export async function GET() {
       page += 1
     }
 
-    type ProductDoc = StorefrontProductDoc & { displayImageUrl: string }
+    const FALLBACK_IMAGE_URL =
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop'
 
-    const resolved = await Promise.all(
-      candidates.map(async (product) => {
-        let displayImageUrl = resolveStorefrontProductImageSync(product)
-        if (!displayImageUrl) {
-          displayImageUrl = await resolveStorefrontProductImageUrl(payload, product)
-        }
-        if (!displayImageUrl) return null
+    const docs = candidates.map((product) => {
+      const displayImageUrl =
+        resolveStorefrontProductImageForListing(product) || FALLBACK_IMAGE_URL
 
-        const priced = resolveProductPricingForStorefront(
-          product as StorefrontProductDoc & ProductPricingFields,
-        )
-        return { ...priced, displayImageUrl } as ProductDoc
-      }),
-    )
-
-    const docs = resolved.filter((doc): doc is ProductDoc => doc != null)
+      const priced = resolveProductPricingForStorefront(
+        product as StorefrontProductDoc & ProductPricingFields,
+      )
+      return { ...priced, displayImageUrl }
+    })
 
     return Response.json(
       {

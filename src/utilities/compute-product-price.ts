@@ -1,22 +1,21 @@
 export function computeProductPriceFromDiscount(
   originalPrice: number,
   discountPercentage: number | null | undefined,
-): { price: number; compareAtPrice: number | null } {
+): { price: number } {
   const original = Math.round(originalPrice)
   const discount = Math.min(100, Math.max(0, Number(discountPercentage ?? 0)))
 
   if (!Number.isFinite(original) || original <= 0) {
-    return { price: 0, compareAtPrice: null }
+    return { price: 0 }
   }
 
   if (!Number.isFinite(discount) || discount <= 0) {
-    return { price: original, compareAtPrice: null }
+    return { price: original }
   }
 
   const price = Math.max(0, Math.round(original * (1 - discount / 100)))
 
   return {
     price,
-    compareAtPrice: original,
   }
 }

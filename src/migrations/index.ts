@@ -12,8 +12,10 @@ import * as migration_20260701_120000_posts_view_count from './20260701_120000_p
 import * as migration_20260702_120000_newsletter from './20260702_120000_newsletter';
 import * as migration_20260703_120000_orders_payment_pickup from './20260703_120000_orders_payment_pickup';
 import * as migration_20260708_105643 from './20260708_105643';
-import * as migration_20260727_104500_products_compare_at_price from './20260727_104500_products_compare_at_price';
-import * as migration_20260727_105000_orders_product_nullable from './20260727_105000_orders_product_nullable';
+import * as migration_20260716_051835_add_payment_details from './20260716_051835_add_payment_details';
+import * as migration_20260716_080440_add_video_url_to_products from './20260716_080440_add_video_url_to_products';
+import * as migration_20260723_063421_brand_discount_refactor from './20260723_063421_brand_discount_refactor';
+import * as migration_20260726_062423_add_qr_image_to_orders from './20260726_062423_add_qr_image_to_orders';
 
 export const migrations = [
   {
@@ -87,13 +89,23 @@ export const migrations = [
     name: '20260708_105643',
   },
   {
-    up: migration_20260727_104500_products_compare_at_price.up,
-    down: migration_20260727_104500_products_compare_at_price.down,
-    name: '20260727_104500_products_compare_at_price',
+    up: migration_20260716_051835_add_payment_details.up,
+    down: migration_20260716_051835_add_payment_details.down,
+    name: '20260716_051835_add_payment_details',
   },
   {
-    up: migration_20260727_105000_orders_product_nullable.up,
-    down: migration_20260727_105000_orders_product_nullable.down,
-    name: '20260727_105000_orders_product_nullable',
+    up: migration_20260716_080440_add_video_url_to_products.up,
+    down: migration_20260716_080440_add_video_url_to_products.down,
+    name: '20260716_080440_add_video_url_to_products',
+  },
+  {
+    up: migration_20260723_063421_brand_discount_refactor.up,
+    down: migration_20260723_063421_brand_discount_refactor.down,
+    name: '20260723_063421_brand_discount_refactor',
+  },
+  {
+    up: migration_20260726_062423_add_qr_image_to_orders.up,
+    down: migration_20260726_062423_add_qr_image_to_orders.down,
+    name: '20260726_062423_add_qr_image_to_orders'
   },
 ];

@@ -53,6 +53,9 @@ type CreateOrderBody = {
   shipping?: ShippingInput
   paymentMethod?: unknown
   couponCode?: unknown
+  transactionId?: unknown
+  bankRemarks?: unknown
+  qrImage?: unknown
 }
 
 function cleanText(value: unknown, maxLength: number): string {
@@ -64,8 +67,8 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
-function parsePaymentMethod(value: unknown): 'cod' | 'pickup' | 'online' | null {
-  if (value === 'cod' || value === 'pickup' || value === 'online') return value
+function parsePaymentMethod(value: unknown): 'cod' | 'pickup' | 'online' | 'qr' | null {
+  if (value === 'cod' || value === 'pickup' || value === 'online' || value === 'qr') return value
   return null
 }
 
@@ -130,6 +133,7 @@ export async function POST(request: Request) {
     if (!paymentMethod) {
       return Response.json({ message: 'Please select a payment method.' }, { status: 400 })
     }
+
 
     if (!guestEmail || !isValidEmail(guestEmail)) {
       return Response.json({ message: 'A valid email address is required.' }, { status: 400 })
@@ -209,7 +213,7 @@ export async function POST(request: Request) {
       lineItems.push({
         product: product.id,
         productName: product.name,
-        productSku: product.sku,
+        productSku: product.sku ?? "",
         unitPrice,
         quantity: item.quantity,
         lineTotal,
@@ -221,7 +225,7 @@ export async function POST(request: Request) {
       discountRate != null ? Math.round(subtotal * discountRate) : 0
     const shippingCost = 0
     const total = Math.max(0, subtotal - discount + shippingCost)
-    const orderStatus = paymentMethod === 'online' ? 'pending_payment' : 'cod_pending'
+    const orderStatus = (paymentMethod === 'online' || paymentMethod === 'qr') ? 'pending_payment' : 'cod_pending'
 
     const order = await payload.create({
       collection: 'orders',
@@ -247,6 +251,11 @@ export async function POST(request: Request) {
         shippingCost,
         total,
         couponCode: discount > 0 ? couponCode : undefined,
+        paymentDetails: paymentMethod === 'qr' ? {
+          gateway: 'Static QR',
+          status: 'pending_verification',
+          qrImage: body.qrImage ? Number(body.qrImage) : undefined
+        } : undefined
       },
     })
 

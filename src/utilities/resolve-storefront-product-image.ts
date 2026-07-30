@@ -52,15 +52,31 @@ export function isValidFeaturedForProduct(product: ProductLike, media: Media): b
   }
 
   const stem = slugStem(product.slug)
-  if (stem.length >= 10 && alt.includes(stem.slice(0, Math.min(32, stem.length)))) {
+  if (
+    stem.length >= 10 &&
+    (alt.includes(stem.slice(0, Math.min(32, stem.length))) ||
+      filename.includes(stem.slice(0, Math.min(32, stem.length))) ||
+      url.includes(stem.slice(0, Math.min(32, stem.length))))
+  ) {
     return true
   }
 
-  if (/product-image/i.test(alt) && stem.length >= 8 && alt.includes(stem.slice(0, 15))) {
+  if (
+    (/product-image/i.test(alt) || /product-image/i.test(filename)) &&
+    stem.length >= 8 &&
+    blob.includes(stem.slice(0, 15))
+  ) {
     return true
   }
 
-  if (stem.length >= 8 && (alt.startsWith(`${stem}-img`) || alt.includes(`${stem}-img-`))) {
+  if (
+    stem.length >= 8 &&
+    (alt.startsWith(`${stem}-img`) ||
+      alt.includes(`${stem}-img-`) ||
+      filename.startsWith(`${stem}-img`) ||
+      filename.includes(`${stem}-img-`) ||
+      filename.includes(stem))
+  ) {
     return true
   }
 
@@ -87,6 +103,10 @@ export function resolveStorefrontProductImageSync(product: ProductLike): string 
     if (isUsableMedia(item) && isValidFeaturedForProduct(product, item)) {
       return mediaUrl(item)
     }
+  }
+
+  if (featured && isUsableMedia(featured)) {
+    return mediaUrl(featured)
   }
 
   return null
